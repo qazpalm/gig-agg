@@ -39,9 +39,9 @@ func main() {
 
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux)
-	routes.RegisterAdminRoutes(mux)
-	routes.RegisterAPIRoutes(mux)
-	routes.RegisterAuthRoutes(mux)
+	//routes.RegisterAdminRoutes(mux)
+	//routes.RegisterAPIRoutes(mux)
+	//routes.RegisterAuthRoutes(mux)
 
 	// Start the server
 	server := &http.Server{
