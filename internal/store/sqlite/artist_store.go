@@ -146,3 +146,92 @@ func (s *sqliteArtistStore) DeleteArtist(id int) error {
 	return nil
 }
 
+func (s *sqliteArtistStore) SearchArtists(query string, count int, offset int) ([]*models.Artist, error) {
+	searchQuery := `SELECT id, name, description, spotify_id FROM artists WHERE name LIKE ? LIMIT ? OFFSET ?`
+	rows, err := s.db.Query(searchQuery, "%"+query+"%", count, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var artists []*models.Artist
+	for rows.Next() {
+		artist := &models.Artist{}
+		err := rows.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get genres for artist
+		genreQuery := `SELECT genre_id FROM artist_genres WHERE artist_id = ?`
+		genreRows, err := s.db.Query(genreQuery, artist.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer genreRows.Close()
+
+		for genreRows.Next() {
+			var genreID int
+			err := genreRows.Scan(&genreID)
+			if err != nil {
+				return nil, err
+			}
+
+			artist.GenreIDs = append(artist.GenreIDs, genreID)
+		}
+
+		artists = append(artists, artist)
+	}
+
+	return artists, nil
+}
+
+func (s *sqliteArtistStore) GetArtistByGenres(genres []models.Genre, count int, offset int) ([]*models.Artist, error) {
+	genreIDs := make([]int, len(genres))
+	for i, genre := range genres {
+		genreIDs[i] = genre.ID
+	}
+
+	query := `SELECT DISTINCT a.id, a.name, a.description, a.spotify_id
+			  FROM artists a
+			  JOIN artist_genres ag ON a.id = ag.artist_id
+			  WHERE ag.genre_id IN (?)
+			  LIMIT ? OFFSET ?`
+
+	rows, err := s.db.Query(query, genreIDs, count, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var artists []*models.Artist
+	for rows.Next() {
+		artist := &models.Artist{}
+		err := rows.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get genres for artist
+		genreQuery := `SELECT genre_id FROM artist_genres WHERE artist_id = ?`
+		genreRows, err := s.db.Query(genreQuery, artist.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer genreRows.Close()
+
+		for genreRows.Next() {
+			var genreID int
+			err := genreRows.Scan(&genreID)
+			if err != nil {
+				return nil, err
+			}
+
+			artist.GenreIDs = append(artist.GenreIDs, genreID)
+		}
+
+		artists = append(artists, artist)
+	}
+
+	return artists, nil
+}
