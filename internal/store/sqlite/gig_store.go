@@ -5,6 +5,7 @@ import (
 	
 	"github.com/qazpalm/gig-agg/internal/models"
 	"github.com/qazpalm/gig-agg/internal/store"
+	"github.com/qazpalm/gig-agg/internal/web"
 )
 
 type sqliteGigStore struct {
@@ -73,7 +74,10 @@ func (s *sqliteGigStore) GetGig(id int) (*models.Gig, error) {
 			return nil, err
 		}
 
-		artist, err := s.GetArtist(artistID)
+		artistQuery := `SELECT id, name, description, spotify_id FROM artists WHERE id = ?`
+		artistRow := s.db.QueryRow(artistQuery, artistID)
+		artist := &models.Artist{}
+		err = artistRow.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
 		if err != nil {
 			return nil, err
 		}
@@ -96,7 +100,10 @@ func (s *sqliteGigStore) GetGig(id int) (*models.Gig, error) {
 			return nil, err
 		}
 
-		genre, err := s.GetGenre(genreID)
+		genreQuery := `SELECT id, name FROM genres WHERE id = ?`
+		genreRow := s.db.QueryRow(genreQuery, genreID)
+		genre := &models.Genre{}
+		err = genreRow.Scan(&genre.ID, &genre.Name)
 		if err != nil {
 			return nil, err
 		}
@@ -137,7 +144,10 @@ func (s *sqliteGigStore) GetGigs(count int, offset int) ([]*models.Gig, error) {
 				return nil, err
 			}
 
-			artist, err := s.GetArtist(artistID)
+			artistQuery := `SELECT id, name, description, spotify_id FROM artists WHERE id = ?`
+			artistRow := s.db.QueryRow(artistQuery, artistID)
+			artist := &models.Artist{}
+			err = artistRow.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
 			if err != nil {
 				return nil, err
 			}
@@ -159,7 +169,10 @@ func (s *sqliteGigStore) GetGigs(count int, offset int) ([]*models.Gig, error) {
 				return nil, err
 			}
 
-			genre, err := s.GetGenre(genreID)
+			genreQuery := `SELECT id, name FROM genres WHERE id = ?`
+			genreRow := s.db.QueryRow(genreQuery, genreID)
+			genre := &models.Genre{}
+			err = genreRow.Scan(&genre.ID, &genre.Name)
 			if err != nil {
 				return nil, err
 			}
@@ -225,7 +238,7 @@ func (s *sqliteGigStore) DeleteGig(id int) error {
 	return nil
 }
 
-func (s *sqliteGigStore) GetGigsByFilters(filters *models.GigFilters, limit, offset int) ([]*models.Gig, error) {
+func (s *sqliteGigStore) GetGigsByFilters(filters *web.GigFilters, limit, offset int) ([]*models.Gig, error) {
 	query := `SELECT id, name, description, venue_id, date_time, ticket_url, created_at FROM gigs WHERE 1=1`
 	args := []interface{}{}
 
@@ -294,7 +307,11 @@ func (s *sqliteGigStore) GetGigsByFilters(filters *models.GigFilters, limit, off
 			if err != nil {
 				return nil, err
 			}
-			artist, err := s.GetArtist(artistID)
+
+			artistQuery := `SELECT id, name, description, spotify_id FROM artists WHERE id = ?`
+			artistRow := s.db.QueryRow(artistQuery, artistID)
+			artist := &models.Artist{}
+			err = artistRow.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
 			if err != nil {
 				return nil, err
 			}

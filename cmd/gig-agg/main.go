@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/store/sqlite"
 )
 
@@ -20,11 +19,11 @@ func main() {
 	}
 
 	// Create stores
-	userStore := store.NewUserStore(db)
-	gigStore := store.NewGigStore(db)
-	venueStore := store.NewVenueStore(db)
-	artistStore := store.NewArtistStore(db)
-	genreStore := store.NewGenreStore(db)
+	userStore 	:= sqlite.NewUserStore(db)
+	gigStore 	:= sqlite.NewGigStore(db)
+	venueStore 	:= sqlite.NewVenueStore(db)
+	artistStore := sqlite.NewArtistStore(db)
+	genreStore 	:= sqlite.NewGenreStore(db)
 
 	_ = userStore
 	_ = gigStore

@@ -104,7 +104,8 @@ const (
 
 // Schema statements grouped for execution
 var schemaStatements = []string{
-	enablesForeignKeys,
+	enableForeignKeys,
+	
 	createTableUsers,
 	createTableArtists,
 	createTableGenres,
@@ -113,6 +114,7 @@ var schemaStatements = []string{
 	createTableGigArtists,
 	createTableGigGenres,
 	createTableArtistGenres,
+
 	createIndexGigDateTime,
 	createIndexGigVenueID,
 	createIndexGigArtists,
