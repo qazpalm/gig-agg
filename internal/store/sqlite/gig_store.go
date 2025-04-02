@@ -224,3 +224,89 @@ func (s *sqliteGigStore) DeleteGig(id int) error {
 
 	return nil
 }
+
+func (s *sqliteGigStore) GetGigsByFilters(filters *models.GigFilters, limit, offset int) ([]*models.Gig, error) {
+	query := `SELECT id, name, description, venue_id, date_time, ticket_url, created_at FROM gigs WHERE 1=1`
+	args := []interface{}{}
+
+	if filters.VenueID != nil {
+		query += ` AND venue_id = ?`
+		args = append(args, *filters.VenueID)
+	}
+	if filters.ArtistID != nil {
+		query += ` AND id IN (SELECT gig_id FROM gig_artists WHERE artist_id = ?)`
+		args = append(args, *filters.ArtistID)
+	}
+	if filters.GenreID != nil {
+		query += ` AND id IN (SELECT gig_id FROM gig_genres WHERE genre_id = ?)`
+		args = append(args, *filters.GenreID)
+	}
+	if filters.FromDate != nil {
+		query += ` AND date_time >= ?`
+		args = append(args, *filters.FromDate)
+	}
+	if filters.ToDate != nil {
+		query += ` AND date_time <= ?`
+		args = append(args, *filters.ToDate)
+	}
+	if filters.Query != "" {
+		query += ` AND name LIKE ?`
+		args = append(args, "%"+filters.Query+"%")
+	}
+
+	query += ` LIMIT ? OFFSET ?`
+	args = append(args, limit, offset)
+
+	rows, err := s.db.Query(query, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	gigs := []*models.Gig{}
+	for rows.Next() {
+		gig := &models.Gig{}
+		err = rows.Scan(&gig.ID, &gig.Name, &gig.Description, &gig.VenueID, &gig.DateTime, &gig.TicketURL, &gig.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+
+		gigs = append(gigs, gig)
+	}
+
+	// Get artists and genres for each gig
+	for _, gig := range gigs {
+		// Get artists
+		query = `SELECT artist_id FROM gig_artists WHERE gig_id = ?`
+		artistRows, err := s.db.Query(query, gig.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer artistRows.Close()
+		for artistRows.Next() {	
+			var artistID int
+			err = artistRows.Scan(&artistID)
+			if err != nil {
+				return nil, err
+			}
+			artist, err := s.GetArtist(artistID)
+			if err != nil {
+				return nil, err
+			}
+			gig.Artists = append(gig.Artists, *artist)
+		}
+		// Get genre IDs
+		query = `SELECT genre_id FROM gig_genres WHERE gig_id = ?`
+		genreRows, err := s.db.Query(query, gig.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer genreRows.Close()
+		for genreRows.Next() {
+			var genreID int
+			gig.GenreIDs = append(gig.GenreIDs, genreID)
+		}
+	}
+
+	return gigs, nil
+}
