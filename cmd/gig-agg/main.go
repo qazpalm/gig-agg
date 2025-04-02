@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/qazpalm/gig-agg/internal/store/sqlite"
+	"github.com/qazpalm/gig-agg/internal/routes"
 )
 
 func main() {
@@ -30,4 +33,26 @@ func main() {
 	_ = venueStore
 	_ = artistStore
 	_ = genreStore
+
+	// Create a new mux router
+	mux := http.NewServeMux()
+
+	// Register grouped routes
+	routes.RegisterHomeRoutes(mux)
+	routes.RegisterAdminRoutes(mux)
+	routes.RegisterAPIRoutes(mux)
+	routes.RegisterAuthRoutes(mux)
+
+	// Start the server
+	server := &http.Server{
+		Addr:    ":8080",
+		Handler: mux,
+	}
+
+	fmt.Println("Starting server on :8080")
+	if err := server.ListenAndServe(); err != nil {
+		fmt.Printf("Error starting server: %v\n", err)
+		return
+	}
+	fmt.Println("Server stopped")
 }
