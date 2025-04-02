@@ -229,18 +229,22 @@ func (s *sqliteGigStore) GetGigsByFilters(filters *models.GigFilters, limit, off
 	query := `SELECT id, name, description, venue_id, date_time, ticket_url, created_at FROM gigs WHERE 1=1`
 	args := []interface{}{}
 
+	// Venue ID filter
 	if filters.VenueID != nil {
 		query += ` AND venue_id = ?`
 		args = append(args, *filters.VenueID)
 	}
+	// Artist ID filter
 	if filters.ArtistID != nil {
 		query += ` AND id IN (SELECT gig_id FROM gig_artists WHERE artist_id = ?)`
 		args = append(args, *filters.ArtistID)
 	}
+	// Genre ID filter
 	if filters.GenreID != nil {
 		query += ` AND id IN (SELECT gig_id FROM gig_genres WHERE genre_id = ?)`
 		args = append(args, *filters.GenreID)
 	}
+	// Date filters
 	if filters.FromDate != nil {
 		query += ` AND date_time >= ?`
 		args = append(args, *filters.FromDate)
@@ -249,6 +253,7 @@ func (s *sqliteGigStore) GetGigsByFilters(filters *models.GigFilters, limit, off
 		query += ` AND date_time <= ?`
 		args = append(args, *filters.ToDate)
 	}
+	// Query string filter
 	if filters.Query != "" {
 		query += ` AND name LIKE ?`
 		args = append(args, "%"+filters.Query+"%")
