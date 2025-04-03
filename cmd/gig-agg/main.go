@@ -6,6 +6,8 @@ import (
 
 	"github.com/qazpalm/gig-agg/internal/store/sqlite"
 	"github.com/qazpalm/gig-agg/internal/routes"
+	"github.com/qazpalm/gig-agg/internal/middleware"
+	"github.com/qazpalm/gig-agg/internal/session"
 )
 
 func main() {
@@ -28,6 +30,9 @@ func main() {
 	artistStore := sqlite.NewArtistStore(db)
 	genreStore 	:= sqlite.NewGenreStore(db)
 
+	// Create session store
+	sessionStore := session.NewSessionStore()
+
 	_ = userStore
 	_ = gigStore
 	_ = venueStore
@@ -36,6 +41,9 @@ func main() {
 
 	// Create a new mux router
 	mux := http.NewServeMux()
+
+	// Register middleware
+	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore)
 
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux)
