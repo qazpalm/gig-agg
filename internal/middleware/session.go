@@ -2,23 +2,24 @@ package middleware
 
 import (
 	"net/http"
+	"time"
 	"github.com/qazpalm/gig-agg/internal/session"
 	"github.com/qazpalm/gig-agg/internal/store"
 )
 
 type SessionMiddleware struct {
 	sessionStore *session.SessionStore
-	userStore    *store.UserStore
+	userStore    store.UserStore
 }
 
-func NewSessionMiddleware(sessionStore *session.SessionStore) *SessionMiddleware {
-	return &SessionMiddleware{sessionStore: sessionStore}
+func NewSessionMiddleware(sessionStore *session.SessionStore, userStore store.UserStore) *SessionMiddleware {
+	return &SessionMiddleware{sessionStore: sessionStore, userStore: userStore}
 }
 
 func (sm *SessionMiddleware) ServeSessionProtected(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionToken := r.Header.Get("session_token")
-		sessionData, exists := sm.sessionStore.GetSession(sessionToken)
+		_, exists := sm.sessionStore.GetSession(sessionToken)
 		if !exists {
 			rememberToken := r.Header.Get("remember_token")
 			// TODO: Check if rememberToken is valid
@@ -40,5 +41,5 @@ func (sm *SessionMiddleware) ServeSessionProtected(next http.Handler) http.Handl
 			w.Header().Set("session_token", newSessionToken)
 		}
 		next.ServeHTTP(w, r)
-	}
+	})
 }

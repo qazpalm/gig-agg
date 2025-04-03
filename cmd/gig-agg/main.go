@@ -46,7 +46,7 @@ func main() {
 	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore)
 
 	// Register grouped routes
-	routes.RegisterHomeRoutes(mux)
+	routes.RegisterHomeRoutes(mux, sessionMiddleware)
 	//routes.RegisterAdminRoutes(mux)
 	//routes.RegisterAPIRoutes(mux)
 	//routes.RegisterAuthRoutes(mux)
