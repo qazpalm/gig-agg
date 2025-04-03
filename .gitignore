@@ -7,6 +7,9 @@
 # bin folder
 bin/
 
+# Database files
+*.db
+
 # Test binary, build artifacts
 *.test
 *.out
