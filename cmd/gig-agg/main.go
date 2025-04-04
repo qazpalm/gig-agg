@@ -8,6 +8,7 @@ import (
 	"github.com/qazpalm/gig-agg/internal/routes"
 	"github.com/qazpalm/gig-agg/internal/middleware"
 	"github.com/qazpalm/gig-agg/internal/session"
+	"github.com/qazpalm/gig-agg/internal/apikeys"
 )
 
 func main() {
@@ -32,6 +33,10 @@ func main() {
 
 	// Create session store
 	sessionStore := session.NewSessionStore()
+
+	// Create API key manager
+	apiKeyManager := apikeys.NewAPIKeyManager()
+	_ = apiKeyManager
 
 	_ = userStore
 	_ = gigStore
