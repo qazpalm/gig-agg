@@ -4,7 +4,7 @@ import (
 	"sync"
 )
 
-const apiKeyArray = []string{
+var apiKeyArray = []string{
 	"api_key_1",
 }
 
@@ -13,10 +13,10 @@ type apiKeyManager struct {
 }
 
 func NewAPIKeyManager() *apiKeyManager {
-	return &APIKeyManager{}
+	return &apiKeyManager{}
 }
 
-func (akm APIKeyManager) Validate(key string) bool {
+func (akm apiKeyManager) Validate(key string) bool {
 	akm.mu.Lock()
 	defer akm.mu.Unlock()
 
