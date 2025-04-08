@@ -120,13 +120,14 @@ func (h *artistHandler) UpdateArtist(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedArtist := &models.Artist{}
+	updatedArtist.ID = id
 	err = json.NewDecoder(r.Body).Decode(updatedArtist)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = h.store.UpdateArtist(id, updatedArtist)
+	err = h.store.UpdateArtist(updatedArtist)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

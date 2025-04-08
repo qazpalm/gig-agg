@@ -16,11 +16,11 @@ func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreS
 	genreHandler 	:= apihandlers.NewGenreHandler(genreStore)
 
 	// Register API routes with middleware
-	mux.Handle("POST /api/artist", apiKeyMiddleware.ServeHTTP(artistHandler.CreateArtist))
-	mux.Handle("GET /api/artist/{id}", apiKeyMiddleware.ServeHTTP(artistHandler.GetArtist))
-	mux.Handle("GET /api/artist", apiKeyMiddleware.ServeHTTP(artistHandler.GetArtists))
-	mux.Handle("PUT /api/artist/{id}", apiKeyMiddleware.ServeHTTP(artistHandler.UpdateArtist))
-	mux.Handle("DELETE /api/artist/{id}", apiKeyMiddleware.ServeHTTP(artistHandler.DeleteArtist))
+	mux.HandleFunc("POST /api/artist", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.CreateArtist)).ServeHTTP)
+	mux.HandleFunc("GET /api/artist/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.GetArtist)).ServeHTTP)
+	mux.HandleFunc("GET /api/artist", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.GetArtists)).ServeHTTP)
+	mux.HandleFunc("PUT /api/artist/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.UpdateArtist)).ServeHTTP)
+	mux.HandleFunc("DELETE /api/artist/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.DeleteArtist)).ServeHTTP)
 
 	mux.HandleFunc("POST /api/genre", 		genreHandler.CreateGenre)
 	mux.HandleFunc("GET /api/genre/{id}", 	genreHandler.GetGenre)

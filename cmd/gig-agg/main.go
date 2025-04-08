@@ -48,12 +48,12 @@ func main() {
 	mux := http.NewServeMux()
 
 	// Register middleware
-	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore, apiKeyManager)
+	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore)
 
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux, sessionMiddleware)
 	//routes.RegisterAdminRoutes(mux)
-	routes.RegisterAPIRoutes(mux, artistStore, genreStore)
+	routes.RegisterAPIRoutes(mux, artistStore, genreStore, apiKeyManager)
 	//routes.RegisterAuthRoutes(mux)
 
 	// Start the server
