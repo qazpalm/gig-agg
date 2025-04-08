@@ -44,6 +44,10 @@ func main() {
 	// Create a new mux router
 	mux := http.NewServeMux()
 
+	// Register static files
+	staticFileServer := http.FileServer(http.Dir("./assets/static"))
+	mux.Handle("/static", http.StripPrefix("/assets/static/", staticFileServer))
+
 	// Register middleware
 	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore)
 
