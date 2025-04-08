@@ -40,9 +40,6 @@ func main() {
 
 	_ = userStore
 	_ = gigStore
-	_ = venueStore
-	_ = artistStore
-	_ = genreStore
 
 	// Create a new mux router
 	mux := http.NewServeMux()
@@ -53,7 +50,7 @@ func main() {
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux, sessionMiddleware)
 	//routes.RegisterAdminRoutes(mux)
-	routes.RegisterAPIRoutes(mux, artistStore, genreStore, apiKeyManager)
+	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, apiKeyManager)
 	//routes.RegisterAuthRoutes(mux)
 
 	// Start the server
