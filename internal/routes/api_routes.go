@@ -8,14 +8,14 @@ import (
 	"github.com/qazpalm/gig-agg/internal/apikeys"
 )
 
-func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, gigStore store.GigStore, venueStore store.VenueStore, apiKeyManager *apikeys.APIKeyManager) {
+func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, venueStore store.VenueStore, gigStore store.GigStore, apiKeyManager *apikeys.APIKeyManager) {
 	// Middleware for API key authentication
 	apiKeyMiddleware := middleware.NewAPIKeyMiddleware(apiKeyManager)
 
 	artistHandler 	:= apihandlers.NewArtistHandler(artistStore)
 	genreHandler 	:= apihandlers.NewGenreHandler(genreStore)
 	venueHandler 	:= apihandlers.NewVenueHandler(venueStore)
-	gigHandler 		:= apihandlers.NewGigHandler(gigStore, artistStore, genreStore, venueStore)
+	gigHandler 		:= apihandlers.NewGigHandler(gigStore)
 
 	// Register API routes with middleware
 	mux.HandleFunc("POST /api/artist", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.CreateArtist)).ServeHTTP)

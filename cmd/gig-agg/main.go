@@ -50,7 +50,7 @@ func main() {
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux, sessionMiddleware)
 	//routes.RegisterAdminRoutes(mux)
-	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, apiKeyManager)
+	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, gigStore, apiKeyManager)
 	//routes.RegisterAuthRoutes(mux)
 
 	// Start the server
