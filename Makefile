@@ -11,6 +11,7 @@ all: build
 # Build the target executable
 build:
 	@mkdir -p $(BIN_DIR)
+	@cp -r ./assets $(BIN_DIR) 
 	go build -o $(TARGET) $(CMD_DIR)
 
 # Run the application
