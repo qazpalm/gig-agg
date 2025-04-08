@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <title>{{ .Title }}</title>
+</head>
+<body>
+    {{template "title_bar.html" .}}
+    <div class="content">
+        {{block "content" .}}<h1>Default Content</h1>{{end}}
+    </div>
+    <footer>
+        <p>&copy; 2025 Gig-Agg. All rights reserved.</p>
+    </footer>
+</html>
