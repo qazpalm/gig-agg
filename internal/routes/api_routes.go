@@ -8,13 +8,14 @@ import (
 	"github.com/qazpalm/gig-agg/internal/apikeys"
 )
 
-func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, venueStore store.VenueStore, apiKeyManager *apikeys.APIKeyManager) {
+func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, gigStore store.GigStore, venueStore store.VenueStore, apiKeyManager *apikeys.APIKeyManager) {
 	// Middleware for API key authentication
 	apiKeyMiddleware := middleware.NewAPIKeyMiddleware(apiKeyManager)
 
 	artistHandler 	:= apihandlers.NewArtistHandler(artistStore)
 	genreHandler 	:= apihandlers.NewGenreHandler(genreStore)
 	venueHandler 	:= apihandlers.NewVenueHandler(venueStore)
+	gigHandler 		:= apihandlers.NewGigHandler(gigStore, artistStore, genreStore, venueStore)
 
 	// Register API routes with middleware
 	mux.HandleFunc("POST /api/artist", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.CreateArtist)).ServeHTTP)
@@ -35,6 +36,10 @@ func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreS
 	mux.HandleFunc("PUT /api/venue/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(venueHandler.UpdateVenue)).ServeHTTP)
 	mux.HandleFunc("DELETE /api/venue/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(venueHandler.DeleteVenue)).ServeHTTP)
 
-
+	mux.HandleFunc("POST /api/gig", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.CreateGig)).ServeHTTP)
+	mux.HandleFunc("GET /api/gig/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.GetGig)).ServeHTTP)
+	mux.HandleFunc("GET /api/gig", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.GetGigs)).ServeHTTP)
+	mux.HandleFunc("PUT /api/gig/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.UpdateGig)).ServeHTTP)
+	mux.HandleFunc("DELETE /api/gig/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.DeleteGig)).ServeHTTP)
 }
 
