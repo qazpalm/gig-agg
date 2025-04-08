@@ -6,7 +6,10 @@ import (
 )
 
 func RenderTemplate(w http.ResponseWriter, templateName string, data interface{}) {
-	tmpl, err := template.ParseFiles("./assets/templates/" + templateName)
+	tmpl, err := template.ParseFiles(
+		"./assets/templates/" + templateName,
+		"./assets/templates/title_bar.html",
+	)
 	if err != nil {
 		http.Error(w, "Error rendering template", http.StatusInternalServerError)
 		return

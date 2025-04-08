@@ -1,0 +1,23 @@
+<!-- Used by go templates to insert as a head above content -->
+<div class="title-bar">
+    <div class="logo">
+        <a href="/">
+            Gig-Agg
+        </a>
+    </div> 
+    <div class="user-actions">
+        {{if .IsLoggedIn}}
+            <span>Welcome, {{.Username}}</span>
+            <a href="/logout">Logout</a>
+        {{else}}
+            <a href="/login">Login</a>
+            <a href="/create-user">Create Account</a>
+        {{end}}
+    </div>
+    <div class="search-bar">
+        <form action="/search" method="get">
+            <input type="text" name="query" placeholder="Search...">
+            <button type="submit">Search</button>
+        </form>
+    </div>
+</div>
