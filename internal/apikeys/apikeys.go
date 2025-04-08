@@ -8,15 +8,15 @@ var apiKeyArray = []string{
 	"api_key_1",
 }
 
-type apiKeyManager struct {
+type ApiKeyManager struct {
 	mu sync.Mutex
 }
 
-func NewAPIKeyManager() *apiKeyManager {
-	return &apiKeyManager{}
+func NewAPIKeyManager() *ApiKeyManager {
+	return &ApiKeyManager{}
 }
 
-func (akm apiKeyManager) Validate(key string) bool {
+func (akm ApiKeyManager) IsValid(key string) bool {
 	akm.mu.Lock()
 	defer akm.mu.Unlock()
 
