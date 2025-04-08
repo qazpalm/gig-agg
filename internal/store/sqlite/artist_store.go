@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 	
 	"github.com/qazpalm/gig-agg/internal/models"
 	"github.com/qazpalm/gig-agg/internal/store"

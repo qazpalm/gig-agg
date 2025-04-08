@@ -4,10 +4,16 @@ import (
 	"net/http"
 	"encoding/json"
 	"strconv"
+	"fmt"
 
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/models"
 )
+
+type getArtistsBody struct {
+	Count  int `json:"count"`
+	Offset int `json:"offset"`
+}
 
 // ArtistHandler handles requests related to artists.
 type artistHandler struct {
@@ -73,4 +79,71 @@ func (h *artistHandler) GetArtist(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetArtists handles the retrieval of all artists.
+func (h *artistHandler) GetArtists(w http.ResponseWriter, r *http.Request) {
+	body := &getArtistsBody{}
+	err := json.NewDecoder(r.Body).Decode(body)
+	if err != nil {
+		fmt.Println("Error decoding request body: ", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	
+	artists, err := h.store.GetArtists(body.Count, body.Offset)
+	fmt.Println("GetArtists: ", artists)
+	
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
+	if artists == nil {
+		http.Error(w, "No artists found", http.StatusNotFound)
+		return
+	}
+
+	// Return the artists data as JSON
+	w.Header().Set("Content-Type", "application/json")
+	err = json.NewEncoder(w).Encode(artists)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *artistHandler) UpdateArtist(w http.ResponseWriter, r *http.Request) {
+	idPath := r.PathValue("id")
+	id, err := strconv.Atoi(idPath)
+	if err != nil {
+		http.Error(w, "Invalid artist ID", http.StatusBadRequest)
+		return
+	}
+
+	updatedArtist := &models.Artist{}
+	err = json.NewDecoder(r.Body).Decode(updatedArtist)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = h.store.UpdateArtist(id, updatedArtist)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
+func (h *artistHandler) DeleteArtist(w http.ResponseWriter, r *http.Request) {
+	idPath := r.PathValue("id")
+	id, err := strconv.Atoi(idPath)
+	if err != nil {
+		http.Error(w, "Invalid artist ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.store.DeleteArtist(id)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
