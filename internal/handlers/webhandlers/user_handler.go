@@ -8,9 +8,9 @@ import (
 
 // UserHandler is a struct that handles user-related HTTP requests.
 type UserHandler struct {
-	userStore     store.UserStore
+	userStore     	store.UserStore
 	userAuthManager *auth.UserAuthManager
-	sessionStore  *session.SessionStore
+	sessionStore  	*session.SessionStore
 }
 
 

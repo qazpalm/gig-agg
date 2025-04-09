@@ -8,6 +8,8 @@ import (
 
 // RegisterHomeRoutes registers the home routes with the given mux.
 func RegisterHomeRoutes(mux *http.ServeMux, sessionMiddleware *middleware.SessionMiddleware) {
-	mux.HandleFunc("/", webhandlers.HomeHandler)
-	mux.HandleFunc("/about", webhandlers.AboutHandler)
+	homeHandler := webhandlers.NewHomeHandler(sessionMiddleware.GetSessionStore())
+	
+	mux.HandleFunc("/", homeHandler.HomeHandler)
+	mux.HandleFunc("/about", homeHandler.AboutHandler)
 }

@@ -6,8 +6,9 @@ import (
 )
 
 type SessionData struct {
-	UserID    int
-	ExpiresAt time.Time
+	UserID    	int
+	Username 	string
+	ExpiresAt 	time.Time
 }
 
 type SessionStore struct {
@@ -21,7 +22,7 @@ func NewSessionStore() *SessionStore {
 	}
 }
 
-func (s *SessionStore) AddSession(token string, userID int, expiresAt time.Time) {
+func (s *SessionStore) AddSession(token string, userID int, username string, expiresAt time.Time) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.sessions[token] = SessionData{
@@ -56,4 +57,24 @@ func (s *SessionStore) CleanupExpiredSessions() {
 			delete(s.sessions, token)
 		}
 	}
+}
+
+func (s *SessionStore) GetUserName(token string) (string, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	session, exists := s.sessions[token]
+	if !exists || session.ExpiresAt.Before(time.Now()) {
+		return "", false
+	}
+	return session.Username, true
+}
+
+func (s *SessionStore) GetUserID(token string) (int, bool) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	session, exists := s.sessions[token]
+	if !exists || session.ExpiresAt.Before(time.Now()) {
+		return 0, false
+	}
+	return session.UserID, true
 }

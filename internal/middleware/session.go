@@ -16,6 +16,10 @@ func NewSessionMiddleware(sessionStore *session.SessionStore, userStore store.Us
 	return &SessionMiddleware{sessionStore: sessionStore, userStore: userStore}
 }
 
+func (sm *SessionMiddleware) GetSessionStore() *session.SessionStore {
+	return sm.sessionStore
+}
+
 func (sm *SessionMiddleware) ServeSessionProtected(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		sessionToken := r.Header.Get("session_token")
@@ -34,6 +38,7 @@ func (sm *SessionMiddleware) ServeSessionProtected(next http.Handler) http.Handl
 			sm.sessionStore.AddSession(
 				newSessionToken,
 				user.ID,
+				user.Username,
 				time.Now().Add(24*time.Hour), // Set session expiration to 24 hours
 			)
 

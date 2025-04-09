@@ -3,6 +3,7 @@ package auth
 import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
+	"net/http"
 
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/models"
@@ -37,7 +38,7 @@ func (uam *UserAuthManager) AuthenticateUser(email, password string) (models.Use
 	// Create a session for the user
 	sessionToken := session.GenerateSessionToken()
 	expiresAt := time.Now().Add(24 * time.Hour) // Set session expiration to 24 hours
-	uam.sessionStore.AddSession(sessionToken, user.ID, expiresAt)
+	uam.sessionStore.AddSession(sessionToken, user.ID, user.Username, expiresAt)
 	user.RememberedToken = sessionToken
 	if err := uam.userStore.UpdateUser(user); err != nil {
 		return models.User{}, err
@@ -67,3 +68,38 @@ func (uam *UserAuthManager) RegisterUser(email, username, password string) (mode
 	return user, nil
 }
 
+func (uam *UserAuthManager) LoginUser(email, password string, w http.ResponseWriter) (models.User, error) {
+	user, err := uam.AuthenticateUser(email, password)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	sessionToken := session.GenerateSessionToken()
+	expiresAt := time.Now().Add(24 * time.Hour) // Set session expiration to 24 hours
+	uam.sessionStore.AddSession(sessionToken, user.ID, user.Username, expiresAt)
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    sessionToken,
+		Expires:  expiresAt,
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+	})
+
+	rememberToken := session.GenerateSessionToken()
+	expiresAt = time.Now().Add(30 * 24 * time.Hour) // Set remember token expiration to 30 days
+	user.RememberedToken = rememberToken
+	if err := uam.userStore.UpdateUser(&user); err != nil {
+		return models.User{}, err
+	}
+	http.SetCookie(w, &http.Cookie{
+		Name:     "remember_token",
+		Value:    rememberToken,
+		Expires:  expiresAt,
+		HttpOnly: true,
+		Secure:   true,
+		Path:     "/",
+	})
+
+	return user, nil
+}
