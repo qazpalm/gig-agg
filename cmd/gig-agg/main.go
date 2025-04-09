@@ -42,9 +42,6 @@ func main() {
 	apiKeyManager := apikeys.NewAPIKeyManager()
 	_ = apiKeyManager
 
-	_ = userStore
-	_ = gigStore
-
 	// Create a new mux router
 	mux := http.NewServeMux()
 
@@ -58,7 +55,7 @@ func main() {
 	// Register grouped routes
 	routes.RegisterHomeRoutes(mux, sessionMiddleware, userStore, sessionStore, userAuthManager)
 	//routes.RegisterAdminRoutes(mux)
-	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, gigStore, apiKeyManager)
+	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, gigStore, userStore, userAuthManager, apiKeyManager)
 	//routes.RegisterAuthRoutes(mux)
 
 	// Start the server

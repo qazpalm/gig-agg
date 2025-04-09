@@ -6,9 +6,10 @@ import (
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/middleware"
 	"github.com/qazpalm/gig-agg/internal/apikeys"
+	"github.com/qazpalm/gig-agg/internal/auth"
 )
 
-func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, venueStore store.VenueStore, gigStore store.GigStore, apiKeyManager *apikeys.APIKeyManager) {
+func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreStore store.GenreStore, venueStore store.VenueStore, gigStore store.GigStore, userStore store.UserStore, authManager *auth.UserAuthManager, apiKeyManager *apikeys.APIKeyManager) {
 	// Middleware for API key authentication
 	apiKeyMiddleware := middleware.NewAPIKeyMiddleware(apiKeyManager)
 
@@ -16,6 +17,7 @@ func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreS
 	genreHandler 	:= apihandlers.NewGenreHandler(genreStore)
 	venueHandler 	:= apihandlers.NewVenueHandler(venueStore)
 	gigHandler 		:= apihandlers.NewGigHandler(gigStore)
+	userHandler 	:= apihandlers.NewUserHandler(userStore, authManager)
 
 	// Register API routes with middleware
 	mux.HandleFunc("POST /api/artist", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(artistHandler.CreateArtist)).ServeHTTP)
@@ -41,5 +43,11 @@ func RegisterAPIRoutes(mux *http.ServeMux, artistStore store.ArtistStore, genreS
 	mux.HandleFunc("GET /api/gig", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.GetGigs)).ServeHTTP)
 	mux.HandleFunc("PUT /api/gig/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.UpdateGig)).ServeHTTP)
 	mux.HandleFunc("DELETE /api/gig/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(gigHandler.DeleteGig)).ServeHTTP)
+
+	mux.HandleFunc("POST /api/user", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(userHandler.CreateUser)).ServeHTTP)
+	mux.HandleFunc("GET /api/user/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(userHandler.GetUser)).ServeHTTP)
+	mux.HandleFunc("GET /api/user", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(userHandler.GetUsers)).ServeHTTP)
+	mux.HandleFunc("PUT /api/user/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(userHandler.UpdateUser)).ServeHTTP)
+	mux.HandleFunc("DELETE /api/user/{id}", apiKeyMiddleware.ServeAuthorised(http.HandlerFunc(userHandler.DeleteUser)).ServeHTTP)
 }
 
