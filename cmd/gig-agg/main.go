@@ -9,6 +9,7 @@ import (
 	"github.com/qazpalm/gig-agg/internal/middleware"
 	"github.com/qazpalm/gig-agg/internal/session"
 	"github.com/qazpalm/gig-agg/internal/apikeys"
+	"github.com/qazpalm/gig-agg/internal/auth"
 )
 
 func main() {
@@ -34,6 +35,9 @@ func main() {
 	// Create session store
 	sessionStore := session.NewSessionStore()
 
+	// Create user auth manager
+	userAuthManager := auth.NewUserAuthManager(userStore, sessionStore)
+
 	// Create API key manager
 	apiKeyManager := apikeys.NewAPIKeyManager()
 	_ = apiKeyManager
@@ -52,7 +56,7 @@ func main() {
 	sessionMiddleware := middleware.NewSessionMiddleware(sessionStore, userStore)
 
 	// Register grouped routes
-	routes.RegisterHomeRoutes(mux, sessionMiddleware)
+	routes.RegisterHomeRoutes(mux, sessionMiddleware, userStore, sessionStore, userAuthManager)
 	//routes.RegisterAdminRoutes(mux)
 	routes.RegisterAPIRoutes(mux, artistStore, genreStore, venueStore, gigStore, apiKeyManager)
 	//routes.RegisterAuthRoutes(mux)

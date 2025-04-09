@@ -26,6 +26,7 @@ func (s *SessionStore) AddSession(token string, userID int, username string, exp
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.sessions[token] = SessionData{
+		Username:  username,
 		UserID:    userID,
 		ExpiresAt: expiresAt,
 	}

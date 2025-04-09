@@ -4,6 +4,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"time"
 	"net/http"
+	"fmt"
 
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/models"
@@ -15,12 +16,16 @@ type UserAuthManager struct {
 	sessionStore *session.SessionStore
 }
 
-func NewUserAuthManager(userStore store.UserStore) *UserAuthManager {
-	return &UserAuthManager{userStore: userStore}
+func NewUserAuthManager(userStore store.UserStore, sessionStore *session.SessionStore) *UserAuthManager {
+	return &UserAuthManager{
+		userStore: userStore,
+		sessionStore: sessionStore,
+	}
 }
 
 func (uam *UserAuthManager) AuthenticateUser(email, password string) (models.User, error) {
 	user, err := uam.userStore.GetUserByEmail(email)
+	fmt.Println("User:", user)
 	if err != nil {
 		return models.User{}, err
 	}

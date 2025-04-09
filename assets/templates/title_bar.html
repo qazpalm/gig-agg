@@ -7,11 +7,11 @@
     </div> 
     <div class="user-actions">
         {{if .IsLoggedIn}}
-            <span>Welcome, {{.Username}}</span>
+            <span>Welcome {{.Username}},</span>
             <a href="/logout">Logout</a>
         {{else}}
             <a href="/login">Login</a>
-            <a href="/create-user">Create Account</a>
+            <a href="/create-account">Create Account</a>
         {{end}}
     </div>
     <div class="search-bar">
