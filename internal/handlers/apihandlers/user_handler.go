@@ -141,7 +141,12 @@ func (h *UserHandler) GetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	users, err := h.store.GetUsers(body.Count, body.Offset)
+	users := []*models.User{}
+	if body.Count <= 0 && body.Offset < 0 {
+		users, err = h.store.GetAllUsers()	
+	} else {
+		users, err = h.store.GetUsers(body.Count, body.Offset)
+	}
 	if err != nil {
 		http.Error(w, "Error retrieving users", http.StatusInternalServerError)
 		return

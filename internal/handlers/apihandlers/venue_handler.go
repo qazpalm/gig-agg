@@ -9,6 +9,11 @@ import (
     "github.com/qazpalm/gig-agg/internal/store"
 )
 
+type getVenuesBody struct {
+    Count  int `json:"count"`
+    Offset int `json:"offset"`
+}
+
 // VenueHandler handles requests related to venues.
 type VenueHandler struct {
     store store.VenueStore
@@ -73,20 +78,21 @@ func (h *VenueHandler) GetVenue(w http.ResponseWriter, r *http.Request) {
 
 // GetVenues handles the retrieval of all venues with pagination.
 func (h *VenueHandler) GetVenues(w http.ResponseWriter, r *http.Request) {
-    countStr := r.URL.Query().Get("count")
-    offsetStr := r.URL.Query().Get("offset")
+    body := &getVenuesBody{}
+	err := json.NewDecoder(r.Body).Decode(body)
+	if err != nil {
+		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		return
+	}
 
-    count, err := strconv.Atoi(countStr)
-    if err != nil || count <= 0 {
-        count = 10 // Default to 10 if not provided or invalid
+    venues := []*models.Venue{}
+    if body.Count <= 0 && body.Offset < 0 {
+        // Return all venues
+        venues, err = h.store.GetAllVenues()
+    } else {
+        // Return venues with pagination
+        venues, err := h.store.GetVenues(body.Count, body.Offset)
     }
-
-    offset, err := strconv.Atoi(offsetStr)
-    if err != nil || offset < 0 {
-        offset = 0 // Default to 0 if not provided or invalid
-    }
-
-    venues, err := h.store.GetVenues(count, offset)
     if err != nil {
         http.Error(w, "Failed to retrieve venues", http.StatusInternalServerError)
         return

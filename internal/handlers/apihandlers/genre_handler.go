@@ -77,7 +77,12 @@ func (h *GenreHandler) GetGenres(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	genres, err := h.store.GetGenres(body.Count, body.Offset)
+	genres := []*models.Genre{}
+	if body.Count <= 0  && body.Offset < 0 {
+		genres, err = h.store.GetAllGenres()
+	} else {
+		genres, err = h.store.GetGenres(body.Count, body.Offset)
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

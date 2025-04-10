@@ -86,7 +86,12 @@ func (h *GigHandler) GetGigs(w http.ResponseWriter, r *http.Request) {
         offset = 0 // Default to 0 if not provided or invalid
     }
 
-    gigs, err := h.store.GetGigs(count, offset)
+    gigs := []*models.Gig{}
+    if count <= 0 && offset < 0 {
+        gigs, err = h.store.GetAllGigs()
+    } else {
+        gigs, err = h.store.GetGigs(count, offset)
+    }
     if err != nil {
         http.Error(w, "Failed to retrieve gigs", http.StatusInternalServerError)
         return

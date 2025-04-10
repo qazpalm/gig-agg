@@ -90,7 +90,13 @@ func (h *artistHandler) GetArtists(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	artists, err := h.store.GetArtists(body.Count, body.Offset)
+	artists := []*models.Artist{}
+	if body.Count <= 0 && body.Offset < 0 {
+		// Return all artists
+		artists, err = h.store.GetAllArtists()	
+	} else {
+		artists, err = h.store.GetArtists(body.Count, body.Offset)
+	}
 	
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
