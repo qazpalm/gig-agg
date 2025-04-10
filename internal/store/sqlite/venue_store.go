@@ -84,3 +84,23 @@ func (s *sqliteVenueStore) DeleteVenue(id int) error {
 	return nil
 }
 
+func (s *sqliteVenueStore) GetAllVenues() ([]*models.Venue, error) {
+	query := `SELECT id, name, address, city, longitude, latitude FROM venues`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var venues []*models.Venue
+	for rows.Next() {
+		venue := &models.Venue{}
+		err := rows.Scan(&venue.ID, &venue.Name, &venue.Address, &venue.City, &venue.Longitude, &venue.Latitude)
+		if err != nil {
+			return nil, err
+		}
+		venues = append(venues, venue)
+	}
+
+	return venues, nil
+}

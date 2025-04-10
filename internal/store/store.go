@@ -13,6 +13,8 @@ type UserStore interface {
 	GetUsers(count int, offset int) ([]*models.User, error)
 	UpdateUser(user *models.User) error
 	DeleteUser(id int) error
+
+	GetAllUsers() ([]*models.User, error)
 }
 
 type GigStore interface {
@@ -21,6 +23,8 @@ type GigStore interface {
 	GetGigs(count int, offset int) ([]*models.Gig, error)
 	UpdateGig(gig *models.Gig) error
 	DeleteGig(id int) error
+
+	GetAllGigs() ([]*models.Gig, error)
 }
 
 type VenueStore interface {
@@ -29,6 +33,8 @@ type VenueStore interface {
 	GetVenues(count int, offset int) ([]*models.Venue, error)
 	UpdateVenue(venue *models.Venue) error
 	DeleteVenue(id int) error
+
+	GetAllVenues() ([]*models.Venue, error)
 }
 
 type ArtistStore interface {
@@ -37,6 +43,8 @@ type ArtistStore interface {
 	GetArtists(count int, offset int) ([]*models.Artist, error)
 	UpdateArtist(artist *models.Artist) error
 	DeleteArtist(id int) error
+
+	GetAllArtists() ([]*models.Artist, error)
 }
 
 type GenreStore interface {
@@ -45,4 +53,6 @@ type GenreStore interface {
 	GetGenres(count int, offset int) ([]*models.Genre, error)
 	UpdateGenre(genre *models.Genre) error
 	DeleteGenre(id int) error
+
+	GetAllGenres() ([]*models.Genre, error)
 }

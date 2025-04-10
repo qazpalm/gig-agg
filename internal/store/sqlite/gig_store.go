@@ -332,3 +332,24 @@ func (s *sqliteGigStore) GetGigsByFilters(filters *web.GigFilters, limit, offset
 
 	return gigs, nil
 }
+
+func (s *sqliteGigStore) GetAllGigs() ([]*models.Gig, error) {
+	query := `SELECT id, name, description, venue_id, date_time, ticket_url, created_at FROM gigs`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var gigs []*models.Gig
+	for rows.Next() {
+		gig := &models.Gig{}
+		err := rows.Scan(&gig.ID, &gig.Name, &gig.Description, &gig.VenueID, &gig.DateTime, &gig.TicketURL, &gig.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		gigs = append(gigs, gig)
+	}
+
+	return gigs, nil
+}

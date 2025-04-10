@@ -235,3 +235,43 @@ func (s *sqliteArtistStore) GetArtistByGenres(genres []models.Genre, count int, 
 
 	return artists, nil
 }
+
+func (s *sqliteArtistStore) GetAllArtists() ([]*models.Artist, error) {
+	query := `SELECT id, name, description, spotify_id FROM artists`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var artists []*models.Artist
+	for rows.Next() {
+		artist := &models.Artist{}
+		err := rows.Scan(&artist.ID, &artist.Name, &artist.Description, &artist.SpotifyID)
+		if err != nil {
+			return nil, err
+		}
+
+		// Get genres for artist
+		genreQuery := `SELECT genre_id FROM artist_genres WHERE artist_id = ?`
+		genreRows, err := s.db.Query(genreQuery, artist.ID)
+		if err != nil {
+			return nil, err
+		}
+		defer genreRows.Close()
+
+		for genreRows.Next() {
+			var genreID int
+			err := genreRows.Scan(&genreID)
+			if err != nil {
+				return nil, err
+			}
+
+			artist.GenreIDs = append(artist.GenreIDs, genreID)
+		}
+
+		artists = append(artists, artist)
+	}
+
+	return artists, nil
+}

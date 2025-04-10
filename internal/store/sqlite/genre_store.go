@@ -83,3 +83,24 @@ func (s *sqliteGenreStore) DeleteGenre(id int) error {
 
 	return nil
 }
+
+func (s *sqliteGenreStore) GetAllGenres() ([]*models.Genre, error) {
+	query := `SELECT id, name FROM genres`
+	rows, err := s.db.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var genres []*models.Genre
+	for rows.Next() {
+		genre := &models.Genre{}
+		err := rows.Scan(&genre.ID, &genre.Name)
+		if err != nil {
+			return nil, err
+		}
+		genres = append(genres, genre)
+	}
+
+	return genres, nil
+}

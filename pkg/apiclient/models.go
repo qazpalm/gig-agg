@@ -210,3 +210,42 @@ func (c *Client) DeleteVenue(id int) error {
 	return nil
 }
 
+func (c *Client) CreateUser(user User) error {
+	// Make the API call to create the user
+	err := c.doRequest("POST", "user", user, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) GetUser(id int) (User, error) {
+	user := User{}
+	err := c.doRequest("GET", fmt.Sprintf("user/%d", id), nil, &user)
+	if err != nil {
+		return User{}, err
+	}
+	return user, nil
+}
+
+func (c *Client) UpdateUser(user User) error {
+	// Make the API call to update the user
+	err := c.doRequest("PUT", fmt.Sprintf("user/%d", user.ID), user, &user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) DeleteUser(id int) error {
+	// Make the API call to delete the user
+	err := c.doRequest("DELETE", fmt.Sprintf("user/%d", id), nil, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
