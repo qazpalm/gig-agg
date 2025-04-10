@@ -91,7 +91,7 @@ func (h *VenueHandler) GetVenues(w http.ResponseWriter, r *http.Request) {
         venues, err = h.store.GetAllVenues()
     } else {
         // Return venues with pagination
-        venues, err := h.store.GetVenues(body.Count, body.Offset)
+        venues, err = h.store.GetVenues(body.Count, body.Offset)
     }
     if err != nil {
         http.Error(w, "Failed to retrieve venues", http.StatusInternalServerError)

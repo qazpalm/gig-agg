@@ -7,6 +7,7 @@ import (
 
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/auth"
+	"github.com/qazpalm/gig-agg/internal/models"
 )
 
 type newUserRequest struct {
