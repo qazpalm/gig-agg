@@ -1,5 +1,13 @@
 package apiclient
 
+import (
+    "bytes"
+    "fmt"
+    "net/http"
+    "encoding/json"
+    "io/ioutil"
+)
+
 type Client struct {
 	BaseURL    string
 	APIKey     string
@@ -16,6 +24,7 @@ func NewClient(baseURL, apiKey string) *Client {
 
 func (c *Client) doRequest(method, endpoint string, body interface{}, result interface{}) error {
     url := fmt.Sprintf("%s/%s", c.BaseURL, endpoint)
+    fmt.Printf("Making %s request to %s\n", method, url)
 
     var reqBody []byte
     var err error
@@ -32,7 +41,7 @@ func (c *Client) doRequest(method, endpoint string, body interface{}, result int
     }
 
     req.Header.Set("Content-Type", "application/json")
-    req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.APIKey))
+    req.Header.Set("X-API-Key", c.APIKey)
 
     resp, err := c.HTTPClient.Do(req)
     if err != nil {
@@ -52,6 +61,7 @@ func (c *Client) doRequest(method, endpoint string, body interface{}, result int
     if result != nil {
         err = json.Unmarshal(respBody, result)
         if err != nil {
+            fmt.Printf("Response body: %s\n", string(respBody))
             return fmt.Errorf("failed to unmarshal response: %w", err)
         }
     }

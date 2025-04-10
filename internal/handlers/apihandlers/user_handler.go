@@ -1,14 +1,11 @@
 package apihandlers
 
-package apihandlers
-
 import (
 	"net/http"
 	"encoding/json"
 	"strconv"
 
 	"github.com/qazpalm/gig-agg/internal/store"
-	"github.com/qazpalm/gig-agg/internal/models"
 	"github.com/qazpalm/gig-agg/internal/auth"
 )
 
@@ -29,8 +26,8 @@ type UserHandler struct {
 	auth  *auth.UserAuthManager
 }
 
-func NewUserHandler(store store.UserStore) *UserHandler {
-	return &UserHandler{store: store}
+func NewUserHandler(store store.UserStore, authManager *auth.UserAuthManager) *UserHandler {
+	return &UserHandler{store: store, auth: authManager}
 }
 
 func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +50,7 @@ func (h *UserHandler) CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if req.IsAdmin {
 		user.IsAdmin = true
-		if err := h.store.UpdateUser(user); err != nil {
+		if err := h.store.UpdateUser(&user); err != nil {
 			http.Error(w, "Error updating user", http.StatusInternalServerError)
 			return
 		}
@@ -68,7 +65,7 @@ func (h *UserHandler) GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.store.GetUserByID(id)
+	user, err := h.store.GetUser(id)
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -96,7 +93,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.store.GetUserByID(id)
+	user, err := h.store.GetUser(id)
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
@@ -109,7 +106,7 @@ func (h *UserHandler) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		user.Username = req.Username
 	}
 	if req.Password != "" {
-		user.Password = req.Password
+		user.PasswordHash = req.Password
 	}
 
 	err = h.store.UpdateUser(user)

@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"encoding/json"
 	"strconv"
+	"fmt"
 
 	"github.com/qazpalm/gig-agg/internal/store"
 	"github.com/qazpalm/gig-agg/internal/models"
@@ -31,6 +32,8 @@ func (h *artistHandler) CreateArtist(w http.ResponseWriter, r *http.Request) {
 	// Get the artist data from the request body
 	err := json.NewDecoder(r.Body).Decode(newArtist)
 	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		fmt.Println("Request body:", r.Body)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

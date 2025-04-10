@@ -1,5 +1,10 @@
 package apiclient
 
+import (
+	"time"
+	"fmt"
+)
+
 type Artist struct {
 	ID   		int		`json:"id"`
 	Name 		string	`json:"name"`
@@ -47,5 +52,34 @@ type User struct {
 	RememberedToken string 		`json:"remembered_token"`
 
 	IsAdmin 		bool 		`json:"is_admin"`
+}
+
+func (c *Client) CreateArtist(artist Artist) error {
+	// Make the API call to create the artist
+	err := c.doRequest("POST", "artist", artist, nil)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (c *Client) GetArtist(id int) (Artist, error) {
+	artist := Artist{}
+	err := c.doRequest("GET", fmt.Sprintf("artist/%d", id), nil, &artist)
+	if err != nil {
+		return Artist{}, err
+	}
+	return artist, nil
+}
+
+func (c *Client) UpdateArtist(artist Artist) (Artist, error) {
+	// Implement the API call to update an artist
+	return Artist{}, nil
+}
+
+func (c *Client) DeleteArtist(id int) error {
+	// Implement the API call to delete an artist
+	return nil
 }
 
