@@ -5,13 +5,13 @@ import (
 )
 
 type DatabaseSync struct {
-	Artists []Artist,
-	Gigs    []Gig,
-	Venues  []Venue,
-	Genres  []Genre,
-	Users   []User,
+	Artists []Artist
+	Gigs    []Gig
+	Venues  []Venue
+	Genres  []Genre
+	Users   []User
 
-	LastUpdate time.Time,
+	LastUpdate time.Time
 }
 
 func NewDatabaseSync() *DatabaseSync {
